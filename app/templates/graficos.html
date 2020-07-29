@@ -1,0 +1,172 @@
+{% extends "template.html" %}
+{% block conteudo %}
+<script type="text/javascript">
+    google.charts.load('current', {
+      'packages':['geochart'],
+      // Note: you will need to get a mapsApiKey for your project.
+      // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
+      'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+    });
+    google.charts.setOnLoadCallback(drawRegionsMap);
+    function drawRegionsMap() {
+      var lst_python = JSON.parse({{ mapa_confirmados | tojson }});
+      var data = google.visualization.arrayToDataTable(lst_python);
+      var options = {
+        region: 'BR',
+        resolution: 'provinces',
+        colorAxis: {colors: ['#FFFFFF', '#D3848F', '#F97E75']},
+        backgroundColor: '#81d4fa',
+        datalessRegionColor: 'transparent',
+        defaultColor: '#f5f5f5',
+      };
+
+      var chart = new google.visualization.GeoChart(document.getElementById('geochart-colors'));
+      chart.draw(data, options);
+    };
+</script>
+<nav class="bg-menu navbar text-white">
+    <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='img/newgen_logo.png') }}" alt="NewGen Logo" width="175px;">
+    </a> 
+    <ul class="mr-auto">
+        <div class="btn-group mb-n3">
+            <button class="btn btn-outline-light btn-lg" type="button">
+                Intervalo de Pesquisas
+            </button>
+            <button type="button" class="btn btn-lg btn-outline-light dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu">
+                {% for dado in intervalo_pesquisas %}
+                    <a class="dropdown-item">{{ dado[0] }} | <span class="text-primary">{{ dado[1] }}</span> - <span class="text-success">{{ dado[2] }}</span></a>
+                {% endfor %}
+            </div>
+        </div>
+    </ul>
+    <form action="/atualiza"  class="form-inline" method="post">
+        <!-- Select UF -->
+        <label for="selectUF">UF</label>
+        <select class="form-control form-control-lg ml-3 mr-5" id="selectUF" name="select_uf">
+            <option value="Acre">Acre</option>
+            <option value="Alagoas">Alagoas</option>
+            <option value="Amapá">Amapá</option>
+            <option value="Amazonas">Amazonas</option>
+            <option value="Bahia">Bahia</option>
+            <option value="Ceará">Ceará</option>
+            <option value="Distrito Federal">Distrito Federal</option>
+            <option value="Espírito Santo">Espírito Santo</option>
+            <option value="Goiás">Goiás</option>
+            <option value="Maranhão">Maranhão</option>
+            <option value="Mato Grosso">Mato Grosso</option>
+            <option value="Mato Grosso do Sul">Mato Grosso do Sul</option>
+            <option value="Minas Gerais">Minas Gerais</option>
+            <option value="Pará">Pará</option>
+            <option value="Paraíba">Paraíba</option>
+            <option value="Paraná">Paraná</option>
+            <option value="Pernambuco">Pernambuco</option>
+            <option value="Piauí">Piauí</option>
+            <option value="Rio de Janeiro">Rio de Janeiro</option>
+            <option value="Rio Grande do Norte">Rio Grande do Norte</option>
+            <option value="Rio Grande do Sul">Rio Grande do Sul</option>
+            <option value="Rondônia">Rondônia</option>
+            <option value="Roraima">Roraima</option>
+            <option value="Santa Catarina">Santa Catarina</option>
+            <option value="São Paulo">São Paulo</option>
+            <option value="Sergipe">Sergipe</option>
+            <option value="Tocantins">Tocantins</option>
+            <option value="Estrangeiro">Estrangeiro</option>
+        </select>
+        <!-- Data Inicial -->
+        <label for="inputDataInicial">Data Inicial</label>
+        <input class="form-control form-control-lg ml-3 mr-5" id="inputDataInicial" name="data_inicial" type="date">
+        <!-- Data Final -->
+        <label for="inputDataFinal">Data Final</label>
+        <input class="form-control form-control-lg ml-3 mr-5" id="inputDataFinal" name="data_final" type="date">
+        <!-- Botão Atualizar -->
+        <button class="btn btn-lg btn-danger" type="submit">Atualizar</button>
+    </form>
+</nav>
+<div class="container-fluid px-5 py-5">
+    <div class="row">
+        <!-- Coluna 1 - Mapa -->
+        <div class="col-md-3">
+            <div class="mb-3" id="geochart-colors" style="width: 100%; height: 300px;"></div>
+            <div class="row scroll-2 text-center">
+                <span class="h5 cor-cinza">Brasil | Confirmados = <span class="badge badge-pill badge-danger">{{ total }}</span></span>
+                <table class="bg-light ml-3 mt-3 table table-bordered table-hover table-sm">
+                    <thead class="cor-cinza">
+                        <th><i class="fas fa-arrow-up"></i> Rank</th>
+                        <th><i class="fas fa-flag"></i> UF</th>
+                        <th><i class="fas fa-head-side-virus"></i> Confirmados</th>
+                        <th><i class="fas fa-skull"></i> Mortos</th>
+                    </thead>
+                    <tbody>
+                        {% for dado in confirmados_uf_desc %}
+                            <tr class="align-center">
+                                <td>{{ loop.index }}º</td>
+                                <td>{{ dado[0] }}</td>
+                                <td>{{ dado[1] }}</td>
+                                <td>{{ dado[2] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Coluna 1 - Gráficos de Linha e de Pizza -->
+        <div class="col-md-5 pl-3">
+            <div class="row">
+                <div class="col-md-12">
+                    {{ charts.area_chart }}
+                </div>
+            </div>
+            <div class="row text-center py-4">
+                <div class="col-md-12">
+                    <span class="h5 cor-cinza">{{ uf }} | Intervalo = <span class="badge badge-pill badge-primary">{{ data_inicial }} - {{ data_final }}</span></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ charts.pie_chart }}
+                </div>
+                <div class="col-md-6">
+                    {{ charts.pie_chart_uf }}
+                </div>
+            </div>
+        </div>
+        <!-- Coluna 1 - Tabelas -->
+        <div class="col-md-4">
+            <div class="row">
+                <div class="bg-secondary col-md-6 py-1 text-white">
+                    <span class="h6">Primeira Pesquisa:</span><span class="h6 float-right">{{ data_min }}</span>
+                </div>
+                <div class="bg-danger col-md-6 py-1 text-white">
+                    <span class="h6">Última Pesquisa:</span><span class="h6 float-right">{{ data_max }}</span>
+                </div>
+            </div>
+            <div class="row scroll-1">
+                <table id="dtBasicExample" class="bg-light table table-bordered table-hover">
+                    <thead class="text-center cor-cinza">
+                        <th>#</th>
+                        <th><i class="fas fa-calendar"></i> Data</th>
+                        <th><i class="fas fa-flag"></i> UF</th>
+                        <th><i class="fas fa-head-side-virus"></i> Confirmados</th>
+                        <th><i class="fas fa-skull"></i> Mortos</th>
+                    </thead>
+                    <tbody class="text-center">
+                        {% for dado in casos %}
+                            <tr>
+                                <td>{{ dado.id }}</td>
+                                <td>{{ dado.data }}</td>
+                                <td>{{ dado.uf }}</td>
+                                <td>{{ dado.confirmados }}</td>
+                                <td>{{ dado.mortes }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

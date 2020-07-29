@@ -1,0 +1,42 @@
+html, body {
+    background-color: #EBEEF0;
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+}
+
+.bg-menu {
+    background-color: #0A466A;
+}
+
+.scroll-1 {
+    border-collapse: collapse;
+    max-height: 79vh;
+    overflow-y: scroll;
+    display: block;
+}
+
+.scroll-2 {
+    border-collapse: collapse;
+    max-height: 50vh;
+    overflow-y: scroll;
+    display: block;
+}
+
+.cor-cinza {
+    color: #999999;
+}
+
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+bottom: .5em;
+}
+
